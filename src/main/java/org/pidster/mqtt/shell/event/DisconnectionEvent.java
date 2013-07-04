@@ -1,4 +1,4 @@
-package org.pidster.mqtt.event;
+package org.pidster.mqtt.shell.event;
 
 public class DisconnectionEvent extends ConnectionEvent {
 

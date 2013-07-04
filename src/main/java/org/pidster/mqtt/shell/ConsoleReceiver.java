@@ -1,7 +1,7 @@
-package org.pidster.mqtt;
+package org.pidster.mqtt.shell;
 
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.pidster.mqtt.event.MqttMessageEvent;
+import org.pidster.mqtt.shell.event.MqttMessageEvent;
 import org.springframework.context.ApplicationListener;
 
 public class ConsoleReceiver implements ApplicationListener<MqttMessageEvent> {

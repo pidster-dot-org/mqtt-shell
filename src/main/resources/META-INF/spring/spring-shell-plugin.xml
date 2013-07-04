@@ -10,6 +10,6 @@
 
     <context:annotation-config />
 
-    <context:component-scan base-package="org.pidster.mqtt"></context:component-scan>
+    <context:component-scan base-package="org.pidster.mqtt.shell"></context:component-scan>
 
 </beans>

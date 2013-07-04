@@ -1,4 +1,4 @@
-package org.pidster.mqtt.config;
+package org.pidster.mqtt.shell.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.shell.plugin.BannerProvider;

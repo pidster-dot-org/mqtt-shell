@@ -1,4 +1,4 @@
-package org.pidster.mqtt.event;
+package org.pidster.mqtt.shell.event;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.springframework.context.ApplicationEvent;

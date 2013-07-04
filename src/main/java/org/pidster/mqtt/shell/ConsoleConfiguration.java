@@ -1,10 +1,10 @@
-package org.pidster.mqtt;
+package org.pidster.mqtt.shell;
 
-import org.pidster.mqtt.config.MqttConsoleBannerProvider;
-import org.pidster.mqtt.config.MqttConsoleHistoryFileNameProvider;
-import org.pidster.mqtt.config.MqttConsolePromptProvider;
-import org.pidster.mqtt.event.ConnectionEventListener;
-import org.pidster.mqtt.event.MqttMessageEventListener;
+import org.pidster.mqtt.shell.config.MqttConsoleBannerProvider;
+import org.pidster.mqtt.shell.config.MqttConsoleHistoryFileNameProvider;
+import org.pidster.mqtt.shell.config.MqttConsolePromptProvider;
+import org.pidster.mqtt.shell.event.ConnectionEventListener;
+import org.pidster.mqtt.shell.event.MqttMessageEventListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;

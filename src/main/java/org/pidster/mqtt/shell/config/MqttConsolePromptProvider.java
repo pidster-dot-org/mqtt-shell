@@ -1,6 +1,6 @@
-package org.pidster.mqtt.config;
+package org.pidster.mqtt.shell.config;
 
-import org.pidster.mqtt.event.ConnectionEvent;
+import org.pidster.mqtt.shell.event.ConnectionEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.shell.plugin.PromptProvider;

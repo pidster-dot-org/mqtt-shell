@@ -1,4 +1,4 @@
-package org.pidster.mqtt;
+package org.pidster.mqtt.shell;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -8,10 +8,10 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
-import org.pidster.mqtt.event.ConnectionEvent;
-import org.pidster.mqtt.event.DisconnectionEvent;
-import org.pidster.mqtt.event.MqttMessageDeliveryEvent;
-import org.pidster.mqtt.event.MqttMessageEvent;
+import org.pidster.mqtt.shell.event.ConnectionEvent;
+import org.pidster.mqtt.shell.event.DisconnectionEvent;
+import org.pidster.mqtt.shell.event.MqttMessageDeliveryEvent;
+import org.pidster.mqtt.shell.event.MqttMessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
