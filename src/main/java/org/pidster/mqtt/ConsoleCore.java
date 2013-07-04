@@ -9,8 +9,12 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.pidster.mqtt.event.ConnectionEvent;
+import org.pidster.mqtt.event.DisconnectionEvent;
+import org.pidster.mqtt.event.MqttMessageDeliveryEvent;
+import org.pidster.mqtt.event.MqttMessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.shell.core.CommandMarker;
@@ -21,7 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
-public class ConsoleCore implements CommandMarker, MqttCallback {
+public class ConsoleCore implements CommandMarker, MqttCallback, DisposableBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ConsoleCore.class);
 
@@ -32,15 +36,17 @@ public class ConsoleCore implements CommandMarker, MqttCallback {
 
 	private MqttConnectOptions options;
 
-	@CliAvailabilityIndicator(value = { "connect" })
-	public boolean connectCheck() {
+	private boolean verbose;
+
+	@CliAvailabilityIndicator({ "connect" })
+	public boolean isDisconnected() {
 		if (client == null) return true;
 		return !client.isConnected();
 	}
 
 	@CliCommand(value = { "connect" }, help = "Connect to an MQTT Broker")
 	public String connect(
-			@CliOption(key = { "host" }, mandatory = true, specifiedDefaultValue = "localhost", help = "Host address") String hostname,
+			@CliOption(key = { "host" }, mandatory = false, specifiedDefaultValue = "localhost", unspecifiedDefaultValue = "localhost", help = "Host address") String hostname,
 			@CliOption(key = { "port" }, mandatory = false, specifiedDefaultValue = "1883", unspecifiedDefaultValue = "1883") int port,
 			@CliOption(key = { "ssl" }, mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false") boolean ssl,
 			@CliOption(key = { "username" }, mandatory = false, specifiedDefaultValue = "anonymous", unspecifiedDefaultValue = "") String username,
@@ -78,9 +84,9 @@ public class ConsoleCore implements CommandMarker, MqttCallback {
 			return e.getMessage();
 		}
 	}
-
-	@CliAvailabilityIndicator(value = { "disconnect" })
-	public boolean disconnectCheck() {
+	
+	@CliAvailabilityIndicator({ "disconnect", "publish", "subscribe", "unsubscribe" })
+	public boolean isConnected() {
 		if (client == null) return false;
 		return client.isConnected();
 	}
@@ -97,7 +103,7 @@ public class ConsoleCore implements CommandMarker, MqttCallback {
 				}
 
 				if (!client.isConnected()) {
-					multicaster.multicastEvent(new ConnectionEvent(this, false));
+					multicaster.multicastEvent(new ConnectionEvent("disconnected", false));
 				}
 
 			} catch (MqttException e) {
@@ -107,12 +113,6 @@ public class ConsoleCore implements CommandMarker, MqttCallback {
 		}
 		
 		return null;
-	}
-	
-	@CliAvailabilityIndicator(value = { "publish" })
-	public boolean publishCheck() {
-		if (client == null) return false;
-		return client.isConnected();
 	}
 
 	@CliCommand(value = { "publish" }, help = "Publish a message to an MQTT Broker")
@@ -127,20 +127,77 @@ public class ConsoleCore implements CommandMarker, MqttCallback {
 
 		client.publish(topic, payload.getBytes(), qos, retained);
 		
-		return String.format("(sent %s)", payload);
+		return (verbose) ? String.format("(sent %s)", payload) : null;
+	}
+
+	@CliCommand(value = { "subscribe" }, help = "Subscribe to topics on an MQTT Broker")
+	public void subscribe(
+			@CliOption(key = { "topic" }, mandatory = true) String topic) throws MqttException {
+
+		if (topic.indexOf(',') > -1) {
+			String[] topics = topic.split(",");
+			client.subscribe(topics);
+		}
+		else {
+			client.subscribe(topic);
+		}
+	}
+
+	@CliCommand(value = { "unsubscribe" }, help = "Unsubscribe from topics on an MQTT Broker")
+	public void unsubscribe(
+			@CliOption(key = { "topic" }, mandatory = true) String topic) throws MqttException {
+
+		if (topic.indexOf(',') > -1) {
+			String[] topics = topic.split(",");
+			client.unsubscribe(topics);
+		}
+		else {
+			client.unsubscribe(topic);
+		}
+	}
+
+	@CliCommand(value = { "subscriptions" }, help = "List current subscriptions to topics on an MQTT Broker")
+	public String subscriptions(Object foo) throws MqttException {
+		return String.valueOf(foo);
+	}
+
+	@CliCommand(value = { "verbose" }, help = "Unsubscribe from topics on an MQTT Broker")
+	public void verbose(
+			@CliOption(key = { "off" }, mandatory = false, specifiedDefaultValue="false", unspecifiedDefaultValue="true") boolean verbose) throws MqttException {
+		this.verbose = verbose;
 	}
 
 	public void connectionLost(Throwable throwable) {
-		multicaster.multicastEvent(new ConnectionEvent(this, false));
+		LOG.error("Connection lost!", throwable);
+		multicaster.multicastEvent(new DisconnectionEvent(throwable));
+
+		try {
+			// pause to permit the event dispatch a fair chance of completing
+			Thread.sleep(1000L);
+		} catch (InterruptedException e) {
+			//
+		}
 		this.client = null;
 	}
 
 	public void deliveryComplete(IMqttDeliveryToken token) {
-		System.out.println(token.getMessageId());
+		multicaster.multicastEvent(new MqttMessageDeliveryEvent(token));
+		if (verbose) {
+			System.out.println("deliveryComplete: " + token.getMessageId());
+		}
 	}
 
 	public void messageArrived(String id, MqttMessage message) throws Exception {
-		System.out.printf("%s %s %n", id, new String(message.getPayload()));
+		multicaster.multicastEvent(new MqttMessageEvent(client, message, id));
+	}
+
+	public void destroy() throws Exception {
+		if (client != null) {
+			if (client.isConnected()) {
+				client.disconnect();
+			}
+			client.close();
+		}
 	}
 
 }

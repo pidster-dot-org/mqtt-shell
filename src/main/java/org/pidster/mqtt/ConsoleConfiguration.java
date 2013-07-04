@@ -4,6 +4,7 @@ import org.pidster.mqtt.config.MqttConsoleBannerProvider;
 import org.pidster.mqtt.config.MqttConsoleHistoryFileNameProvider;
 import org.pidster.mqtt.config.MqttConsolePromptProvider;
 import org.pidster.mqtt.event.ConnectionEventListener;
+import org.pidster.mqtt.event.MqttMessageEventListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -34,6 +35,15 @@ public class ConsoleConfiguration {
     @Bean
     public ConnectionEventListener connectionEventListener() {
         return new ConnectionEventListener(promptProvider());
+    }
+
+    private ConsoleReceiver consoleReceiver() {
+        return new ConsoleReceiver();
+    }
+
+    @Bean
+    public MqttMessageEventListener mqttMessageEventListener() {
+        return new MqttMessageEventListener(consoleReceiver());
     }
 
 }

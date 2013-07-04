@@ -19,7 +19,8 @@ public class MqttConsoleBannerProvider implements BannerProvider {
 	}
 
 	public String getBanner() {
-		return banner;
+		// return banner;
+		return null;
 	}
 
 	public String getVersion() {
@@ -27,7 +28,8 @@ public class MqttConsoleBannerProvider implements BannerProvider {
 	}
 
 	public String getWelcomeMessage() {
-		return welcomeMessage;
+		// return welcomeMessage;
+		return null;
 	}
 
 }
