@@ -16,6 +16,7 @@
 
 apply plugin: 'java'
 apply plugin: 'application'
+apply from: 'gradle/maven.gradle'
 
 mainClassName = 'org.springframework.shell.Bootstrap'
 
@@ -54,5 +55,5 @@ installApp {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '1.6'
+	gradleVersion = project.gradleVersion
 }
