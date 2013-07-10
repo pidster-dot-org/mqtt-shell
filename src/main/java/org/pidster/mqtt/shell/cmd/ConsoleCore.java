@@ -65,7 +65,7 @@ public class ConsoleCore implements CommandMarker, MqttCallback, DisposableBean 
 
 	@CliCommand(value = { "connect" }, help = "Connect to an MQTT Broker")
 	public String connect(
-			@CliOption(key = { "host" }, mandatory = false, specifiedDefaultValue = "localhost", unspecifiedDefaultValue = "localhost", help = "Host address") String hostname,
+			@CliOption(key = { "", "host" }, mandatory = false, specifiedDefaultValue = "localhost", unspecifiedDefaultValue = "localhost", help = "Host address") String hostname,
 			@CliOption(key = { "port" }, mandatory = false, specifiedDefaultValue = "1883", unspecifiedDefaultValue = "1883") int port,
 			@CliOption(key = { "ssl" }, mandatory = false, specifiedDefaultValue = "true", unspecifiedDefaultValue = "false") boolean ssl,
 			@CliOption(key = { "username" }, mandatory = false, specifiedDefaultValue = "anonymous", unspecifiedDefaultValue = "") String username,
@@ -137,7 +137,7 @@ public class ConsoleCore implements CommandMarker, MqttCallback, DisposableBean 
 	@CliCommand(value = { "publish" }, help = "Publish a message to an MQTT Broker")
 	public String publish(
 			@CliOption(key = { "topic" }, mandatory = true) String topic,
-			@CliOption(key = { "message" }, mandatory = true) String payload,
+			@CliOption(key = { "", "message" }, mandatory = true) String payload,
 			@CliOption(key = { "qos" }, mandatory = false, specifiedDefaultValue="1", unspecifiedDefaultValue="0") int qos,
 			@CliOption(key = { "retained" }, mandatory = false, specifiedDefaultValue="true", unspecifiedDefaultValue="false") boolean retained)
 					throws MqttPersistenceException, MqttException {
@@ -151,7 +151,7 @@ public class ConsoleCore implements CommandMarker, MqttCallback, DisposableBean 
 
 	@CliCommand(value = { "subscribe" }, help = "Subscribe to topics on an MQTT Broker")
 	public void subscribe(
-			@CliOption(key = { "topic" }, mandatory = true) String topic) throws MqttException {
+			@CliOption(key = { "", "topic" }, mandatory = true) String topic) throws MqttException {
 
 		if (topic.indexOf(',') > -1) {
 			String[] topics = topic.split(",");
@@ -164,7 +164,7 @@ public class ConsoleCore implements CommandMarker, MqttCallback, DisposableBean 
 
 	@CliCommand(value = { "unsubscribe" }, help = "Unsubscribe from topics on an MQTT Broker")
 	public void unsubscribe(
-			@CliOption(key = { "topic" }, mandatory = true) String topic) throws MqttException {
+			@CliOption(key = { "", "topic" }, mandatory = true) String topic) throws MqttException {
 
 		if (topic.indexOf(',') > -1) {
 			String[] topics = topic.split(",");
@@ -182,8 +182,11 @@ public class ConsoleCore implements CommandMarker, MqttCallback, DisposableBean 
 
 	@CliCommand(value = { "verbose" }, help = "Unsubscribe from topics on an MQTT Broker")
 	public void verbose(
-			@CliOption(key = { "off" }, mandatory = false, specifiedDefaultValue="false", unspecifiedDefaultValue="true") boolean verbose) throws MqttException {
-		this.verbose = verbose;
+			@CliOption(key = { "off" }, mandatory = false, specifiedDefaultValue="true", unspecifiedDefaultValue="false") boolean off) throws MqttException {
+		if (off) {
+			this.verbose = false;
+		}
+		this.verbose = true;
 	}
 
 	public void connectionLost(Throwable throwable) {
