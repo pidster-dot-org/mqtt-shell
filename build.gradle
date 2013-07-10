@@ -53,6 +53,10 @@ dependencies {
     testCompile "org.springframework:spring-test:$springVersion"
 }
 
+run {
+	standardInput = System.in
+}
+
 installApp {
 	destinationDir = file('install')
 }
